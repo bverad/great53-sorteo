@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- responde las solicitudes en español.
+
+- considera las buenas practicas de react
+- considera las buenas practicas para proyectos frontend.
+
+- considera el escalado a distintos dispositivos. 
