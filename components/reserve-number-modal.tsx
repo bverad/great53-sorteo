@@ -143,8 +143,7 @@ export function ReserveNumberModal({
               <div className="text-sm">
                 <p className="font-medium text-blue-900 mb-1">Importante:</p>
                 <p className="text-blue-700">
-                  Después de reservar, debes realizar la transferencia de $50,000 COP y enviar el comprobante por
-                  WhatsApp para confirmar tu participación.
+                  Después de reservar, debes realizar la transferencia de $3.000 y enviar el comprobante por WhatsApp.
                 </p>
               </div>
             </div>
