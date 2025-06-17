@@ -100,12 +100,6 @@ export function AdminAuth({ children }: AdminAuthProps) {
                 Iniciar Sesión
               </Button>
             </form>
-
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-2">Credenciales de prueba:</p>
-              <p className="text-sm font-mono">Usuario: admin</p>
-              <p className="text-sm font-mono">Contraseña: great53admin</p>
-            </div>
           </CardContent>
         </Card>
       </div>
