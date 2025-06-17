@@ -78,13 +78,13 @@ export function LotteryDraw() {
       setAlerta("No hay suficientes participantes para este premio.")
       return
     }
-    
+
     setIsDrawing(true)
     setCurrentDrawing(premioIndex)
-    
+
     // Animación de sorteo más larga para mayor dramatismo
     await new Promise((resolve) => setTimeout(resolve, 3000))
-    
+
     const randomIndex = Math.floor(Math.random() * pool.length)
     const ganador = pool[randomIndex]
     
@@ -134,7 +134,7 @@ export function LotteryDraw() {
               </div>
               <div className="bg-blue-100 p-3 rounded-full">
                 <Gift className="h-8 w-8 text-blue-600" />
-              </div>
+            </div>
             </div>
           </CardContent>
         </Card>
@@ -146,14 +146,14 @@ export function LotteryDraw() {
                 <p className="text-sm font-medium text-purple-700 mb-1">Total Recaudado</p>
                 <p className="text-3xl font-bold text-purple-600">${(paidNumbers.length * 3000).toLocaleString("es-CL")}</p>
                 <p className="text-xs text-purple-600 mt-1">CLP $3.000 por número</p>
-              </div>
+          </div>
               <div className="bg-purple-100 p-3 rounded-full">
                 <Sparkles className="h-8 w-8 text-purple-600" />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
+                  </div>
 
       {/* Alerta mejorada */}
       {alerta && (
@@ -162,7 +162,7 @@ export function LotteryDraw() {
             <div className="flex items-center space-x-3">
               <div className="bg-yellow-100 p-2 rounded-full">
                 <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              </div>
+                </div>
               <p className="text-yellow-800 font-medium">{alerta}</p>
             </div>
           </CardContent>
@@ -175,7 +175,7 @@ export function LotteryDraw() {
           <CardTitle className="flex items-center space-x-3 text-2xl">
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-lg">
               <Trophy className="h-6 w-6 text-white" />
-            </div>
+              </div>
             <span>Sorteo de Premios</span>
           </CardTitle>
           <p className="text-gray-600">Realiza el sorteo en orden del 4° al 1° lugar</p>
@@ -214,13 +214,13 @@ export function LotteryDraw() {
                         <Clock className="h-4 w-4" />
                       </div>
                     )}
-                  </div>
+              </div>
 
                   <div className="flex items-center gap-6">
                     {/* Icono del premio */}
                     <div className={`p-4 rounded-full ${isCompleted ? `bg-gradient-to-r ${premio.color}` : "bg-gray-200"}`}>
                       <IconComponent className={`h-8 w-8 ${isCompleted ? "text-white" : "text-gray-500"}`} />
-                    </div>
+              </div>
 
                     {/* Información del premio */}
                     <div className="flex-1">
@@ -229,8 +229,8 @@ export function LotteryDraw() {
                       </h3>
                       <p className={`text-sm ${isCompleted ? "text-gray-600" : "text-gray-500"}`}>
                         {premio.nombre}
-                      </p>
-                    </div>
+                </p>
+              </div>
 
                     {/* Botón de sorteo */}
                     <div className="flex flex-col items-end gap-2">
@@ -260,7 +260,7 @@ export function LotteryDraw() {
                             Sortear {premio.lugar}
                           </>
                         )}
-                      </Button>
+              </Button>
                     </div>
                   </div>
 

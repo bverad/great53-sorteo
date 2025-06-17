@@ -59,8 +59,8 @@ export function Footer() {
             <h4 className="text-lg font-semibold mb-4">Contacto</h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-400">+56957226277</span>
                 </div>
                 <button

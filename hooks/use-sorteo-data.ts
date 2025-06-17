@@ -108,10 +108,10 @@ export function useSorteoData() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         numero: numberToReserve,
-        customerName: customerData.name,
-        customerPhone: customerData.phone,
-        customerEmail: customerData.email,
-        customerNotes: customerData.notes,
+              customerName: customerData.name,
+              customerPhone: customerData.phone,
+              customerEmail: customerData.email,
+              customerNotes: customerData.notes,
         paymentStatus: "pending",
       }),
     })

@@ -20,14 +20,14 @@ export function PrizeSection() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-4 rounded-lg">
                 <img src="/premios/1er-lugar.jpg" alt="Motocicleta BERA" className="w-80 h-80 object-cover object-center rounded-lg mx-auto mb-2" />
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">1er Lugar</h3>
                 <p className="text-gray-600 mb-2">Motocicleta Marca BERA MOTORCYCLES, MODELO SBR, MOTOR 150CC.<br/>*El costo de la documentación del vehículo va por cuenta del ganador.</p>
                 <p className="text-sm text-gray-600">
                   Patrocinador: <a href="https://instagram.com/berasantiagocl" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">@berasantiagocl</a>
                 </p>
-              </div>
+                  </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <img src="/premios/2do-lugar.jpg" alt="Cabañas Araucanía Pura" className="w-80 h-80 object-cover object-center rounded-lg mx-auto mb-2" />
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">2do Lugar</h3>
@@ -35,7 +35,7 @@ export function PrizeSection() {
                 <p className="text-sm text-gray-600">
                   Patrocinador: <a href="https://instagram.com/araucaniapura" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">@araucaniapura</a>
                 </p>
-              </div>
+                </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <img src="/premios/3er-lugar.jpg" alt="Metanoia Relax" className="w-80 h-80 object-cover object-center rounded-lg mx-auto mb-2" />
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">3er Lugar</h3>
@@ -43,7 +43,7 @@ export function PrizeSection() {
                 <p className="text-sm text-gray-600">
                   Patrocinador: <a href="https://instagram.com/metanoia_relax" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">@metanoia_relax</a>
                 </p>
-              </div>
+                </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <img src="/premios/4to-lugar.jpg" alt="Set de velas Lumisenciia" className="w-80 h-80 object-cover object-center rounded-lg mx-auto mb-2" />
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">4to Lugar</h3>

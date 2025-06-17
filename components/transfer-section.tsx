@@ -11,14 +11,14 @@ export function TransferSection() {
   const [copied, setCopied] = useState<string | null>(null)
 
   const bankInfo = {
-    company: "Austral Motos Spa",
-    rut: "77.692.562-4",
-    bank: "Banco Santander",
+    company: "Corporación de amigos del hospital Roberto del río",
+    rut: "72.210.600-8",
+    bank: "Scotiabank",
     accountType: "Cuenta Corriente",
-    accountNumber: "0-000-9351320-7",
-    email: "yeanlara.ceo@berasantiago.net",
+    accountNumber: "2600515-9",
+    email: "coar@coar.cl",
     phone: "+56957226277",
-    contactEmail: "bruno.zeroleft@gmail.com",
+    contactEmail: "coar@coar.cl",
   }
 
   const copyToClipboard = (text: string, field: string) => {
@@ -33,7 +33,10 @@ export function TransferSection() {
     window.open(whatsappUrl, '_blank')
   }
 
-  const qrValue = `Empresa: Austral Motos Spa\nRUT: 77.692.562-4\nBanco: Santander\nTipo de cuenta: Corriente\nNúmero de cuenta: 0-000-9351320-7\nEmail: yeanlara.ceo@berasantiago.net`;
+  const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+  const qrValue = isProd
+    ? 'https://great53-sorteo-production.up.railway.app/transferencia'
+    : 'http://localhost:3000/transferencia';
 
   return (
     <section className="py-16 bg-white">
