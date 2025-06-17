@@ -1,7 +1,13 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
-import { Heart, Users, Gift } from "lucide-react"
+import { Heart, Users, Gift, Instagram } from "lucide-react"
 
 export function HeroSection() {
+  const openInstagram = () => {
+    window.open('https://www.instagram.com/coar.cl', '_blank')
+  }
+
   return (
     <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,6 +17,16 @@ export function HeroSection() {
             Un grupo humano comprometido con dar amor al universo. En apoyo a los niños de la Fundación COAR,
             organizamos este sorteo especial.
           </p>
+          <div className="flex items-center justify-center space-x-3">
+            <span className="text-gray-600">Conoce más sobre la Fundación COAR:</span>
+            <button
+              onClick={openInstagram}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+              title="Síguenos en Instagram"
+            >
+              <Instagram className="h-5 w-5 text-white" />
+            </button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
