@@ -4,17 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { QrCode, Copy, CreditCard, Phone, Building } from "lucide-react"
 import { useState } from "react"
+import dynamic from "next/dynamic"
+import QRCode from "react-qr-code"
 
 export function TransferSection() {
   const [copied, setCopied] = useState<string | null>(null)
 
   const bankInfo = {
-    bank: "Banco de Bogotá",
-    accountType: "Cuenta de Ahorros",
-    accountNumber: "123-456789-01",
-    accountHolder: "Fundación COAR",
-    nit: "900.123.456-7",
-    phone: "+57 300 123 4567",
+    bank: "BCI",
+    accountType: "Cuenta Corriente",
+    accountNumber: "37851039",
+    accountHolder: "Bruno Vera",
+    rut: "16.148.387-7",
+    phone: "+56957226277",
   }
 
   const copyToClipboard = (text: string, field: string) => {
@@ -22,6 +24,8 @@ export function TransferSection() {
     setCopied(field)
     setTimeout(() => setCopied(null), 2000)
   }
+
+  const qrValue = `Banco: BCI\nTipo de cuenta: Corriente\nNúmero de cuenta: 37851039\nTitular: Bruno Vera\nRUT: 16.148.387-7`;
 
   return (
     <section className="py-16 bg-white">
@@ -81,12 +85,12 @@ export function TransferSection() {
 
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600">NIT</span>
-                  <Button variant="ghost" size="sm" onClick={() => copyToClipboard(bankInfo.nit, "nit")}>
+                  <span className="text-sm font-medium text-gray-600">RUT</span>
+                  <Button variant="ghost" size="sm" onClick={() => copyToClipboard(bankInfo.rut, "rut")}>
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="font-semibold text-gray-900">{bankInfo.nit}</p>
+                <p className="font-semibold text-gray-900">{bankInfo.rut}</p>
               </div>
             </CardContent>
           </Card>
@@ -102,9 +106,7 @@ export function TransferSection() {
             <CardContent className="p-6">
               <div className="text-center mb-6">
                 <div className="bg-white p-4 rounded-lg border-2 border-gray-200 inline-block mb-4">
-                  <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <QrCode className="h-24 w-24 text-gray-400" />
-                  </div>
+                  <QRCode value={qrValue} size={200} />
                 </div>
                 <p className="text-sm text-gray-600">
                   Escanea el código QR para acceder rápidamente a los datos bancarios
@@ -127,8 +129,7 @@ export function TransferSection() {
                     <span className="font-medium text-gray-900">Importante</span>
                   </div>
                   <p className="text-sm text-gray-700">
-                    Después de realizar la transferencia, envía el comprobante por WhatsApp indicando el número que
-                    deseas reservar.
+                    Después de realizar la transferencia, envía el comprobante por WhatsApp.
                   </p>
                 </div>
               </div>

@@ -14,7 +14,7 @@ import { LotteryDraw } from "@/components/admin/lottery-draw"
 export function AdminDashboard() {
   // Agregar un estado para controlar las pestañas
   const [activeTab, setActiveTab] = useState<"dashboard" | "lottery">("dashboard")
-  const { numbers, updatePaymentStatus, getStats } = useSorteoData()
+  const { numbers, updatePaymentStatus, updateReservationStatus, getStats } = useSorteoData()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<"all" | "reserved" | "available">("all")
   const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "pending" | "cancelled">("all")
@@ -145,7 +145,7 @@ export function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Ingresos</p>
-                      <p className="text-2xl font-bold text-purple-600">${(stats.paid * 50000).toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-purple-600">${(stats.paid * 3000).toLocaleString("es-CL")}</p>
                     </div>
                     <CreditCard className="h-8 w-8 text-purple-600" />
                   </div>
@@ -234,9 +234,29 @@ export function AdminDashboard() {
                         <tr key={num.number} className="border-b hover:bg-gray-50">
                           <td className="p-2 font-mono font-medium">{num.number.toString().padStart(3, "0")}</td>
                           <td className="p-2">
-                            <Badge variant={num.isReserved ? "destructive" : "default"}>
-                              {num.isReserved ? "Reservado" : "Disponible"}
-                            </Badge>
+                            <Select
+                              value={num.isReserved ? "reservado" : "disponible"}
+                              onValueChange={async (value) => {
+                                if (value === "disponible") {
+                                  await updateReservationStatus(num.number, false)
+                                } else {
+                                  await updateReservationStatus(num.number, true, {
+                                    name: num.customerName,
+                                    phone: num.customerPhone,
+                                    email: num.customerEmail,
+                                    notes: num.customerNotes,
+                                  })
+                                }
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="disponible">Disponible</SelectItem>
+                                <SelectItem value="reservado">Reservado</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </td>
                           <td className="p-2">{num.customerName || "-"}</td>
                           {/* En la sección de tbody, agregar la celda del teléfono */}

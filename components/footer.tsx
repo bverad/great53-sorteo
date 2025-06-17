@@ -33,11 +33,11 @@ export function Footer() {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-400">+57 300 123 4567</span>
+                <span className="text-gray-400">+56957226277</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-400">info@great53.org</span>
+                <span className="text-gray-400">bruno.zeroletf@gmail.com</span>
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 Great 53. Todos los derechos reservados. Sorteo con fines benéficos para la Fundación COAR.
+            © 2025 Great 53. Todos los derechos reservados. Sorteo con fines benéficos para la Fundación COAR.
           </p>
         </div>
       </div>

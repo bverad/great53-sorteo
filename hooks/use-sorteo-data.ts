@@ -24,26 +24,42 @@ export function useSorteoData() {
   const [numbers, setNumbers] = useState<SorteoNumber[]>([])
   const [drawHistory, setDrawHistory] = useState<DrawResult[]>([])
 
-  useEffect(() => {
-    // Inicializar números del 1 al 1000
+  // Refrescar datos desde la API
+  const fetchAndSetNumbers = () => {
     const initialNumbers: SorteoNumber[] = Array.from({ length: 1000 }, (_, i) => ({
       number: i + 1,
       isReserved: false,
     }))
+    fetch("/api/reservas")
+      .then((res) => {
+        console.log("Respuesta de /api/reservas", res);
+        return res.json();
+      })
+      .then((reservas) => {
+        console.log("Datos de reservas recibidos", reservas);
+        const merged = initialNumbers.map((num) => {
+          const reserva = reservas.find((r: any) => r.numero === num.number)
+          if (reserva) {
+            return {
+              ...num,
+              isReserved: true,
+              customerName: reserva.customerName,
+              customerPhone: reserva.customerPhone,
+              customerEmail: reserva.customerEmail,
+              customerNotes: reserva.customerNotes,
+              paymentStatus: reserva.paymentStatus,
+              reservedDate: reserva.fecha,
+            }
+          }
+          return num
+        })
+        setNumbers(merged)
+      })
+  }
 
-    // Simular algunos números reservados para demostración
-    const reservedNumbers = [1, 7, 13, 21, 42, 77, 100, 123, 456, 789, 999]
-    reservedNumbers.forEach((num) => {
-      const index = num - 1
-      if (initialNumbers[index]) {
-        initialNumbers[index].isReserved = true
-        initialNumbers[index].customerName = `Cliente ${num}`
-        initialNumbers[index].paymentStatus = Math.random() > 0.5 ? "paid" : "pending"
-        initialNumbers[index].reservedDate = new Date().toLocaleDateString()
-      }
-    })
-
-    setNumbers(initialNumbers)
+  useEffect(() => {
+    console.log("Intentando consultar /api/reservas");
+    fetchAndSetNumbers();
   }, [])
 
   const getAvailableCount = () => {
@@ -69,11 +85,16 @@ export function useSorteoData() {
     }
   }
 
-  const updatePaymentStatus = (numberToUpdate: number, status: "pending" | "paid" | "cancelled") => {
-    setNumbers((prev) => prev.map((num) => (num.number === numberToUpdate ? { ...num, paymentStatus: status } : num)))
+  const updatePaymentStatus = async (numberToUpdate: number, status: "pending" | "paid" | "cancelled") => {
+    await fetch("/api/reservas", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ numero: numberToUpdate, paymentStatus: status }),
+    })
+    fetchAndSetNumbers()
   }
 
-  const reserveNumber = (
+  const reserveNumber = async (
     numberToReserve: number,
     customerData: {
       name: string
@@ -82,23 +103,47 @@ export function useSorteoData() {
       notes?: string
     },
   ) => {
-    setNumbers((prev) =>
-      prev.map((num) =>
-        num.number === numberToReserve
-          ? {
-              ...num,
-              isReserved: true,
-              customerName: customerData.name,
-              customerPhone: customerData.phone,
-              customerEmail: customerData.email,
-              customerNotes: customerData.notes,
-              paymentStatus: "pending" as const,
-              reservedDate: new Date().toLocaleDateString(),
-            }
-          : num,
-      ),
-    )
+    await fetch("/api/reservas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        numero: numberToReserve,
+        customerName: customerData.name,
+        customerPhone: customerData.phone,
+        customerEmail: customerData.email,
+        customerNotes: customerData.notes,
+        paymentStatus: "pending",
+      }),
+    })
+    fetchAndSetNumbers()
   }
+
+  const updateReservationStatus = async (numberToUpdate: number, isReserved: boolean, customerData?: any) => {
+    if (isReserved) {
+      // Reservar (igual que reserveNumber)
+      await fetch("/api/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          numero: numberToUpdate,
+          customerName: customerData?.name || "",
+          customerPhone: customerData?.phone || "",
+          customerEmail: customerData?.email || "",
+          customerNotes: customerData?.notes || "",
+          paymentStatus: "pending",
+        }),
+      });
+      fetchAndSetNumbers();
+    } else {
+      // Liberar (hacer disponible)
+      await fetch("/api/reservas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numero: numberToUpdate }),
+      });
+      fetchAndSetNumbers();
+    }
+  };
 
   const addDrawResult = (result: DrawResult) => {
     setDrawHistory((prev) => [result, ...prev])
@@ -112,6 +157,7 @@ export function useSorteoData() {
     getStats,
     updatePaymentStatus,
     reserveNumber,
+    updateReservationStatus,
     addDrawResult,
   }
 }

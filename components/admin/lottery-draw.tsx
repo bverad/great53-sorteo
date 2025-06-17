@@ -76,7 +76,7 @@ export function LotteryDraw() {
 
             <div className="bg-purple-50 p-4 rounded-lg text-center">
               <Sparkles className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-purple-600">${(paidNumbers.length * 50000).toLocaleString()}</p>
+              <p className="text-2xl font-bold text-purple-600">${(paidNumbers.length * 3000).toLocaleString("es-CL")}</p>
               <p className="text-sm text-gray-600">Recaudado</p>
             </div>
           </div>

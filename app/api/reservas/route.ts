@@ -28,4 +28,22 @@ export async function POST(req: NextRequest) {
   reservas.push({ ...nuevaReserva, fecha: new Date().toISOString() });
   await guardarReservas(reservas);
   return NextResponse.json({ ok: true });
+}
+
+export async function PATCH(req: NextRequest) {
+  const { numero, ...updates } = await req.json();
+  let reservas = await leerReservas();
+  reservas = reservas.map((r: any) =>
+    r.numero === numero ? { ...r, ...updates } : r
+  );
+  await guardarReservas(reservas);
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(req: NextRequest) {
+  const { numero } = await req.json();
+  let reservas = await leerReservas();
+  reservas = reservas.filter((r: any) => r.numero !== numero);
+  await guardarReservas(reservas);
+  return NextResponse.json({ ok: true });
 } 
