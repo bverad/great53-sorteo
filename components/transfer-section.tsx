@@ -33,10 +33,10 @@ export function TransferSection() {
     window.open(whatsappUrl, '_blank')
   }
 
-  const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
-  const qrValue = isProd
-    ? 'https://great53-sorteo-production.up.railway.app/transferencia'
-    : 'http://localhost:3000/transferencia';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+  const qrValue = `${baseUrl}/transferencia`;
 
   return (
     <section className="py-16 bg-white">
