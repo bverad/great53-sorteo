@@ -17,9 +17,64 @@ async function guardarReservas(reservas: any[]) {
   await fs.writeFile(RESERVAS_PATH, JSON.stringify(reservas, null, 2), 'utf-8');
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  
+  // Parámetros de paginación y filtrado
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '1000');
+  const search = searchParams.get('search') || '';
+  const status = searchParams.get('status') || 'all';
+  const payment = searchParams.get('payment') || 'all';
+  
   const reservas = await leerReservas();
-  return NextResponse.json(reservas);
+  
+  // Aplicar filtros
+  let filteredReservas = reservas;
+  
+  if (search) {
+    filteredReservas = filteredReservas.filter((r: any) => 
+      r.numero.toString().padStart(3, "0").includes(search) ||
+      (r.customerName && r.customerName.toLowerCase().includes(search.toLowerCase()))
+    );
+  }
+  
+  if (status === 'reserved') {
+    // Solo reservados (todos los que están en el archivo)
+    filteredReservas = filteredReservas;
+  } else if (status === 'available') {
+    // Para disponibles, necesitamos crear un array con todos los números no reservados
+    const reservedNumbers = new Set(reservas.map((r: any) => r.numero));
+    filteredReservas = Array.from({ length: 1000 }, (_, i) => ({
+      numero: i + 1,
+      isReserved: false
+    })).filter((num: any) => !reservedNumbers.has(num.numero));
+  }
+  
+  if (payment !== 'all') {
+    filteredReservas = filteredReservas.filter((r: any) => r.paymentStatus === payment);
+  }
+  
+  // Aplicar paginación
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedReservas = filteredReservas.slice(startIndex, endIndex);
+  
+  // Calcular estadísticas
+  const total = filteredReservas.length;
+  const totalPages = Math.ceil(total / limit);
+  
+  return NextResponse.json({
+    data: paginatedReservas,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
+    }
+  });
 }
 
 export async function POST(req: NextRequest) {

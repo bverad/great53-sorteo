@@ -20,22 +20,46 @@ export interface SorteoNumber {
   reservedDate?: string
 }
 
-export function useSorteoData() {
+interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
+interface ApiResponse {
+  data: SorteoNumber[]
+  pagination: PaginationInfo
+}
+
+export function useSorteoDataOptimized() {
   const [numbers, setNumbers] = useState<SorteoNumber[]>([])
   const [drawHistory, setDrawHistory] = useState<DrawResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null)
   const [lastFetch, setLastFetch] = useState<number>(0)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   // Cache de 30 segundos para evitar llamadas innecesarias
   const CACHE_DURATION = 30000
 
-  // Refrescar datos desde la API con caché
-  const fetchAndSetNumbers = useCallback(async (force = false) => {
+  // Refrescar datos desde la API con caché y parámetros
+  const fetchAndSetNumbers = useCallback(async (
+    force = false,
+    params: {
+      page?: number
+      limit?: number
+      search?: string
+      status?: string
+      payment?: string
+    } = {}
+  ) => {
     const now = Date.now()
     
-    // Verificar caché
-    if (!force && now - lastFetch < CACHE_DURATION) {
+    // Verificar caché solo si no hay parámetros específicos
+    if (!force && Object.keys(params).length === 0 && now - lastFetch < CACHE_DURATION) {
       return
     }
 
@@ -50,12 +74,15 @@ export function useSorteoData() {
     try {
       setIsLoading(true)
       
-      const initialNumbers: SorteoNumber[] = Array.from({ length: 1000 }, (_, i) => ({
-        number: i + 1,
-        isReserved: false,
-      }))
+      // Construir URL con parámetros
+      const url = new URL('/api/reservas', window.location.origin)
+      if (params.page) url.searchParams.set('page', params.page.toString())
+      if (params.limit) url.searchParams.set('limit', params.limit.toString())
+      if (params.search) url.searchParams.set('search', params.search)
+      if (params.status) url.searchParams.set('status', params.status)
+      if (params.payment) url.searchParams.set('payment', params.payment)
 
-      const response = await fetch("/api/reservas", {
+      const response = await fetch(url.toString(), {
         signal: abortControllerRef.current.signal
       })
 
@@ -64,13 +91,20 @@ export function useSorteoData() {
       }
 
       const responseData = await response.json();
-      const reservas = Array.isArray(responseData) ? responseData : responseData.data;
+      const result = Array.isArray(responseData) ? { data: responseData, pagination: { page: 1, limit: 1000, total: responseData.length, totalPages: 1, hasNext: false, hasPrev: false } } : responseData;
       
-      const merged = initialNumbers.map((num) => {
-        const reserva = reservas.find((r: any) => r.numero === num.number)
-        if (reserva) {
-          return {
-            ...num,
+      // Crear array completo de 1000 números
+      const allNumbers: SorteoNumber[] = Array.from({ length: 1000 }, (_, i) => ({
+        number: i + 1,
+        isReserved: false,
+      }))
+
+      // Marcar los números reservados
+      result.data.forEach((reserva: any) => {
+        const index = reserva.numero - 1
+        if (index >= 0 && index < allNumbers.length) {
+          allNumbers[index] = {
+            ...allNumbers[index],
             isReserved: true,
             customerName: reserva.customerName,
             customerPhone: reserva.customerPhone,
@@ -80,10 +114,10 @@ export function useSorteoData() {
             reservedDate: reserva.fecha,
           }
         }
-        return num
       })
       
-      setNumbers(merged)
+      setNumbers(allNumbers)
+      setPagination(result.pagination)
       setLastFetch(now)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -153,10 +187,10 @@ export function useSorteoData() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         numero: numberToReserve,
-              customerName: customerData.name,
-              customerPhone: customerData.phone,
-              customerEmail: customerData.email,
-              customerNotes: customerData.notes,
+        customerName: customerData.name,
+        customerPhone: customerData.phone,
+        customerEmail: customerData.email,
+        customerNotes: customerData.notes,
         paymentStatus: "pending",
       }),
     })
@@ -218,6 +252,7 @@ export function useSorteoData() {
     numbers,
     drawHistory,
     isLoading,
+    pagination,
     getAvailableCount,
     getReservedCount,
     getStats,
@@ -226,5 +261,6 @@ export function useSorteoData() {
     updateReservationStatus,
     updateCustomerData,
     addDrawResult,
+    fetchAndSetNumbers,
   }
-}
+} 

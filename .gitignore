@@ -27,4 +27,4 @@ yarn-error.log*
 next-env.d.ts
 
 # Archivo de reservas (persistencia local)
-reservas.json
+# reservas.json
