@@ -50,10 +50,10 @@ export function useSorteoData() {
     try {
       setIsLoading(true)
       
-      const initialNumbers: SorteoNumber[] = Array.from({ length: 1000 }, (_, i) => ({
-        number: i + 1,
-        isReserved: false,
-      }))
+    const initialNumbers: SorteoNumber[] = Array.from({ length: 1000 }, (_, i) => ({
+      number: i + 1,
+      isReserved: false,
+    }))
 
       const response = await fetch("/api/reservas", {
         signal: abortControllerRef.current.signal
@@ -93,7 +93,7 @@ export function useSorteoData() {
       console.error("Error al cargar datos:", error)
     } finally {
       setIsLoading(false)
-    }
+      }
   }, [lastFetch])
 
   useEffect(() => {
@@ -163,6 +163,36 @@ export function useSorteoData() {
     fetchAndSetNumbers(true) // Forzar actualización
   }
 
+  const reserveMultipleNumbers = async (
+    numbersToReserve: number[],
+    customerData: {
+      name: string
+      phone: string
+      email?: string
+      notes?: string
+    },
+  ) => {
+    const response = await fetch("/api/reservas/multiple", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        numbers: numbersToReserve,
+        name: customerData.name,
+        phone: customerData.phone,
+        email: customerData.email,
+        notes: customerData.notes,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Error al reservar números')
+    }
+
+    fetchAndSetNumbers(true) // Forzar actualización
+    return response.json()
+  }
+
   const updateReservationStatus = async (numberToUpdate: number, isReserved: boolean, customerData?: any) => {
     if (isReserved) {
       // Reservar (igual que reserveNumber)
@@ -223,6 +253,7 @@ export function useSorteoData() {
     getStats,
     updatePaymentStatus,
     reserveNumber,
+    reserveMultipleNumbers,
     updateReservationStatus,
     updateCustomerData,
     addDrawResult,

@@ -7,8 +7,11 @@ const RESERVAS_PATH = path.resolve(process.cwd(), 'reservas.json');
 async function leerReservas() {
   try {
     const data = await fs.readFile(RESERVAS_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch {
+    const parsed = JSON.parse(data);
+    console.log('Datos leídos del archivo:', typeof parsed, Array.isArray(parsed) ? 'es array' : 'no es array');
+    return parsed;
+  } catch (error) {
+    console.log('Error leyendo reservas, devolviendo array vacío:', error);
     return [];
   }
 }
@@ -29,8 +32,11 @@ export async function GET(req: NextRequest) {
   
   const reservas = await leerReservas();
   
+  // Asegurar que reservas siempre sea un array
+  const reservasArray = Array.isArray(reservas) ? reservas : [];
+  
   // Aplicar filtros
-  let filteredReservas = reservas;
+  let filteredReservas = reservasArray;
   
   if (search) {
     filteredReservas = filteredReservas.filter((r: any) => 
@@ -42,22 +48,37 @@ export async function GET(req: NextRequest) {
   if (status === 'reserved') {
     // Solo reservados (todos los que están en el archivo)
     filteredReservas = filteredReservas;
+    
+    // Aplicar filtro de pago solo para reservas (que tienen paymentStatus)
+    if (payment !== 'all') {
+      filteredReservas = filteredReservas.filter((r: any) => r.paymentStatus === payment);
+    }
   } else if (status === 'available') {
     // Para disponibles, necesitamos crear un array con todos los números no reservados
-    const reservedNumbers = new Set(reservas.map((r: any) => r.numero));
+    const reservedNumbers = new Set(reservasArray.map((r: any) => r.numero));
     filteredReservas = Array.from({ length: 1000 }, (_, i) => ({
       numero: i + 1,
       isReserved: false
     })).filter((num: any) => !reservedNumbers.has(num.numero));
-  }
-  
-  if (payment !== 'all') {
-    filteredReservas = filteredReservas.filter((r: any) => r.paymentStatus === payment);
+    
+    // Los números disponibles no tienen paymentStatus, así que ignoramos el filtro de pago
+  } else {
+    // status === 'all' o cualquier otro valor
+    if (payment !== 'all') {
+      filteredReservas = filteredReservas.filter((r: any) => r.paymentStatus === payment);
+    }
   }
   
   // Aplicar paginación
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
+  
+  // Asegurar que filteredReservas sea un array antes de usar slice
+  if (!Array.isArray(filteredReservas)) {
+    console.error('filteredReservas no es un array:', typeof filteredReservas, filteredReservas);
+    filteredReservas = [];
+  }
+  
   const paginatedReservas = filteredReservas.slice(startIndex, endIndex);
   
   // Calcular estadísticas

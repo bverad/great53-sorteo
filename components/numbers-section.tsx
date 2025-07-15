@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, Grid, List } from "lucide-react"
+import { Search, Filter, Grid, List, User } from "lucide-react"
 import { useSorteoData } from "@/hooks/use-sorteo-data"
 import { ReserveNumberModal } from "@/components/reserve-number-modal"
+import { ReserveMultipleNumbersModal } from "@/components/reserve-multiple-numbers-modal"
 
 export function NumbersSection() {
-  const { numbers, getAvailableCount, getReservedCount, reserveNumber } = useSorteoData()
+  const { numbers, getAvailableCount, getReservedCount, reserveNumber, reserveMultipleNumbers } = useSorteoData()
   const [searchTerm, setSearchTerm] = useState("")
   const [filter, setFilter] = useState<"all" | "available" | "reserved">("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -18,6 +19,9 @@ export function NumbersSection() {
   const [showReserveModal, setShowReserveModal] = useState(false)
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null)
   const [isReserving, setIsReserving] = useState(false)
+
+  const [showMultipleReserveModal, setShowMultipleReserveModal] = useState(false)
+  const [isReservingMultiple, setIsReservingMultiple] = useState(false)
 
   const filteredNumbers = useMemo(() => {
     let filtered = numbers
@@ -49,13 +53,39 @@ export function NumbersSection() {
 
     setIsReserving(true)
 
-    // Simular delay de reserva
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      await reserveNumber(selectedNumber, customerData)
+      setShowReserveModal(false)
+      setSelectedNumber(null)
+    } catch (error) {
+      console.error('Error al reservar:', error)
+    } finally {
+      setIsReserving(false)
+    }
+  }
 
-    reserveNumber(selectedNumber, customerData)
-    setIsReserving(false)
-    setShowReserveModal(false)
-    setSelectedNumber(null)
+  const handleMultipleReserve = async (data: { 
+    numbers: number[]
+    name: string
+    phone: string
+    email?: string
+    notes?: string 
+  }) => {
+    setIsReservingMultiple(true)
+
+    try {
+      await reserveMultipleNumbers(data.numbers, {
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        notes: data.notes,
+      })
+      setShowMultipleReserveModal(false)
+    } catch (error) {
+      console.error('Error al reservar múltiples números:', error)
+    } finally {
+      setIsReservingMultiple(false)
+    }
   }
 
   return (
@@ -97,54 +127,68 @@ export function NumbersSection() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Buscar número..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+            <div className="flex flex-col gap-4">
+              {/* Botón de reserva múltiple */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setShowMultipleReserveModal(true)}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3"
+                  size="lg"
+                >
+                  <User className="h-5 w-5 mr-2" />
+                  Reservar Múltiples Números
+                </Button>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Buscar número..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex gap-2">
-                <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")} size="sm">
-                  Todos
-                </Button>
-                <Button
-                  variant={filter === "available" ? "default" : "outline"}
-                  onClick={() => setFilter("available")}
-                  size="sm"
-                >
-                  Disponibles
-                </Button>
-                <Button
-                  variant={filter === "reserved" ? "default" : "outline"}
-                  onClick={() => setFilter("reserved")}
-                  size="sm"
-                >
-                  Reservados
-                </Button>
-              </div>
+                <div className="flex gap-2">
+                  <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")} size="sm">
+                    Todos
+                  </Button>
+                  <Button
+                    variant={filter === "available" ? "default" : "outline"}
+                    onClick={() => setFilter("available")}
+                    size="sm"
+                  >
+                    Disponibles
+                  </Button>
+                  <Button
+                    variant={filter === "reserved" ? "default" : "outline"}
+                    onClick={() => setFilter("reserved")}
+                    size="sm"
+                  >
+                    Reservados
+                  </Button>
+                </div>
 
-              <div className="flex gap-1 border rounded-lg p-1">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1 border rounded-lg p-1">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -212,6 +256,13 @@ export function NumbersSection() {
           onReserve={handleReserve}
           numberToReserve={selectedNumber}
           isLoading={isReserving}
+        />
+        <ReserveMultipleNumbersModal
+          isOpen={showMultipleReserveModal}
+          onClose={() => setShowMultipleReserveModal(false)}
+          onReserve={handleMultipleReserve}
+          numbers={numbers}
+          isLoading={isReservingMultiple}
         />
       </div>
     </section>

@@ -11,10 +11,11 @@ import { useSorteoData } from "@/hooks/use-sorteo-data"
 // Agregar el import del componente de sorteo
 import { LotteryDraw } from "@/components/admin/lottery-draw"
 import { EditCustomerModal } from "@/components/admin/edit-customer-modal"
+import { MultipleNumbersParticipants } from "@/components/admin/multiple-numbers-participants"
 
 export function AdminDashboard() {
   // Agregar un estado para controlar las pestañas
-  const [activeTab, setActiveTab] = useState<"dashboard" | "lottery">("dashboard")
+  const [activeTab, setActiveTab] = useState<"dashboard" | "lottery" | "multiple">("dashboard")
   const { numbers, updatePaymentStatus, updateReservationStatus, updateCustomerData, getStats, isLoading } = useSorteoData()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<"all" | "reserved" | "available">("all")
@@ -167,6 +168,16 @@ export function AdminDashboard() {
             >
               Realizar Sorteo
             </button>
+            <button
+              onClick={() => setActiveTab("multiple")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "multiple"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Múltiples Números
+            </button>
           </div>
         </div>
       </div>
@@ -287,7 +298,7 @@ export function AdminDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>Gestión de Números</CardTitle>
+                <CardTitle>Gestión de Números</CardTitle>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-gray-600">Mostrar:</span>
@@ -323,7 +334,7 @@ export function AdminDashboard() {
                         <th className="text-left p-2">Acciones</th>
                       </tr>
                     </thead>
-                                      <tbody>
+                    <tbody>
                     {isLoading ? (
                       <tr>
                         <td colSpan={7} className="p-8 text-center">
@@ -386,21 +397,21 @@ export function AdminDashboard() {
                           <td className="p-2 text-sm text-gray-600">{num.reservedDate || "-"}</td>
                           <td className="p-2">
                             <div className="flex items-center space-x-2">
-                              {num.isReserved && (
-                                <Select
-                                  value={num.paymentStatus || "pending"}
-                                  onValueChange={(value) => updatePaymentStatus(num.number, value as any)}
-                                >
-                                  <SelectTrigger className="w-32">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="pending">Pendiente</SelectItem>
-                                    <SelectItem value="paid">Pagado</SelectItem>
-                                    <SelectItem value="cancelled">Cancelado</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              )}
+                            {num.isReserved && (
+                              <Select
+                                value={num.paymentStatus || "pending"}
+                                onValueChange={(value) => updatePaymentStatus(num.number, value as any)}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pendiente</SelectItem>
+                                  <SelectItem value="paid">Pagado</SelectItem>
+                                  <SelectItem value="cancelled">Cancelado</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
                               {num.isReserved && (
                                 <Button
                                   variant="outline"
@@ -417,7 +428,7 @@ export function AdminDashboard() {
                         </tr>
                       ))
                     )}
-                  </tbody>
+                    </tbody>
                   </table>
 
                   {paginatedNumbers.length === 0 && (
@@ -501,8 +512,10 @@ export function AdminDashboard() {
               </CardContent>
             </Card>
           </>
-        ) : (
+        ) : activeTab === "lottery" ? (
           <LotteryDraw />
+        ) : (
+          <MultipleNumbersParticipants numbers={numbers} />
         )}
       </div>
 
